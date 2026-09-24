@@ -64,6 +64,23 @@
     margin-top: 16px;
     flex-wrap: wrap;
   }
+  .search-box{
+    margin-top: 18px;
+  }
+  .search-box input{
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    padding: 9px 14px;
+    border-radius: 8px;
+    width: min(240px, 100%);
+    outline: none;
+    transition: border-color 0.15s ease;
+  }
+  .search-box input:focus{ border-color: var(--text-faint); }
+  .search-box input::placeholder{ color: var(--text-faint); }
   .legend-item{
     display:flex;
     align-items:center;
@@ -207,6 +224,9 @@
       <div class="legend-item"><span class="legend-dot" style="background:var(--data)"></span>Data &amp; Backend</div>
       <div class="legend-item"><span class="legend-dot" style="background:var(--web)"></span>Web &amp; Visualization</div>
       <div class="legend-item"><span class="legend-dot" style="background:var(--core)"></span>Core</div>
+    </div>
+    <div class="search-box">
+      <input type="text" id="skillSearch" placeholder="search a skill…" autocomplete="off" spellcheck="false" />
     </div>
   </header>
   <main>
@@ -544,6 +564,24 @@ function closePanel(){
 }
 
 svg.on('click', () => closePanel());
+
+const searchInput = document.getElementById('skillSearch');
+if (searchInput){
+  searchInput.addEventListener('input', () => {
+    const q = searchInput.value.trim().toLowerCase();
+    if (!q){ closePanel(); return; }
+    const matches = nodes.filter(n => n.id !== 'me' && n.label.toLowerCase().includes(q)).map(n => n.id);
+    if (matches.length === 0){
+      highlightSet(new Set());
+      panel.classList.remove('open');
+    } else if (matches.length === 1){
+      showProjectsFor(matches[0]);
+    } else {
+      highlightSet(new Set(matches));
+      panel.classList.remove('open');
+    }
+  });
+}
 </script>
 </body>
 </html>

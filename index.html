@@ -4,6 +4,14 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Michelle C. Bou Rojas</title>
+<meta name="description" content="Computer engineering student building AI agents, RAG systems, and data-driven solutions.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Michelle C. Bou Rojas">
+<meta property="og:description" content="Computer engineering student building AI agents, RAG systems, and data-driven solutions.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Michelle C. Bou Rojas">
+<meta name="twitter:description" content="Computer engineering student building AI agents, RAG systems, and data-driven solutions.">
+<meta name="theme-color" content="#12161d">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -32,6 +40,7 @@
     -webkit-font-smoothing: antialiased;
     padding-top: env(safe-area-inset-top, 0px);
     padding-bottom: env(safe-area-inset-bottom, 0px);
+    overflow-x: hidden;
   }
   a{ color: var(--text); text-decoration: none; }
   .wrap{
@@ -43,9 +52,42 @@
 
   /* ---------- header / hero ---------- */
   header{
-    padding: clamp(48px, 9vh, 88px) 0 28px;
+    position: relative;
+    isolation: isolate;
+    padding: clamp(56px, 10vh, 100px) 0 32px;
     opacity: 0;
     animation: rise 0.6s ease-out 0.05s forwards;
+  }
+  header::before,
+  header::after{
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(70px);
+    z-index: -1;
+    pointer-events: none;
+  }
+  header::before{
+    width: 320px; height: 320px;
+    background: var(--ai);
+    opacity: 0.20;
+    top: -120px; left: -100px;
+    animation: drift1 16s ease-in-out infinite alternate;
+  }
+  header::after{
+    width: 260px; height: 260px;
+    background: var(--web);
+    opacity: 0.18;
+    top: -40px; right: -110px;
+    animation: drift2 18s ease-in-out infinite alternate;
+  }
+  @keyframes drift1{
+    from{ transform: translate(0, 0); }
+    to{ transform: translate(40px, 50px); }
+  }
+  @keyframes drift2{
+    from{ transform: translate(0, 0); }
+    to{ transform: translate(-35px, 45px); }
   }
   @keyframes rise{
     from{ opacity: 0; transform: translateY(8px); }
@@ -53,34 +95,67 @@
   }
   @media (prefers-reduced-motion: reduce){
     header{ animation: none; opacity: 1; }
+    header::before, header::after{ animation: none; }
+  }
+  .eyebrow{
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    color: var(--text-faint);
+    margin: 0 0 18px;
+  }
+  .eyebrow .dot{
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--data);
+    box-shadow: 0 0 0 3px rgba(89,195,180,0.16);
+    flex-shrink: 0;
   }
   h1{
-    font-size: clamp(30px, 5vw, 42px);
+    font-size: clamp(32px, 5vw, 44px);
     font-weight: 600;
     letter-spacing: -0.015em;
-    margin: 0 0 14px;
+    margin: 0 0 16px;
+  }
+  h1 .accent{
+    background: linear-gradient(90deg, var(--ai), var(--web));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
   header p.tagline{
     color: var(--text-dim);
-    font-size: 16px;
+    font-size: 16.5px;
     max-width: 54ch;
-    margin: 0 0 26px;
+    margin: 0 0 30px;
   }
   .links{
     display:flex;
     flex-wrap: wrap;
-    gap: 22px;
-    font-size: 14px;
+    gap: 12px;
+    font-size: 13.5px;
   }
   .links a{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     color: var(--text-dim);
-    border-bottom: 1px solid transparent;
-    padding-bottom: 2px;
-    transition: color 0.15s ease, border-color 0.15s ease;
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 999px;
+    padding: 9px 16px;
+    transition: color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
   }
   .links a:hover{
     color: var(--text);
     border-color: var(--text-faint);
+    transform: translateY(-1px);
+  }
+  .links svg{
+    width: 14px; height: 14px;
+    flex-shrink: 0;
   }
 
   /* ---------- graph embed ---------- */
@@ -149,8 +224,19 @@
     font-size: 14.5px;
     color: var(--text-dim);
     margin: 0;
-    max-width: 58ch;
+    max-width: 60ch;
   }
+  .entry ul.outcome-list{
+    margin: 0;
+    padding-left: 18px;
+    max-width: 62ch;
+  }
+  .entry ul.outcome-list li{
+    font-size: 14.5px;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+  }
+  .entry ul.outcome-list li:last-child{ margin-bottom: 0; }
 
   /* ---------- two-up grid (education / certs) ---------- */
   .grid-2{
@@ -222,6 +308,92 @@
     font-size: 13px;
     color: var(--text-faint);
   }
+
+  /* ---------- scroll reveal ---------- */
+  .observe{
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .observe.in-view{
+    opacity: 1;
+    transform: none;
+  }
+  @media (prefers-reduced-motion: reduce){
+    .observe{ opacity: 1; transform: none; transition: none; }
+  }
+
+  /* ---------- stat card ---------- */
+  .stat-card{
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin: 0 0 30px;
+    padding: 20px 22px;
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 12px;
+  }
+  .stat-number{
+    font-size: 38px;
+    font-weight: 600;
+    color: var(--ai);
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .stat-label{
+    font-size: 13.5px;
+    color: var(--text-dim);
+    max-width: 40ch;
+  }
+
+  /* ---------- flow diagram ---------- */
+  .flow-diagram{ margin: 16px 0 0; }
+  .flow-diagram .flow-kicker{
+    font-size: 11.5px;
+    color: var(--text-faint);
+    margin: 0 0 8px;
+  }
+  .flow-diagram svg{
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* ---------- terminal ---------- */
+  .term{
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    font-size: 13px;
+  }
+  .term-output{
+    max-height: 220px;
+    overflow-y: auto;
+    margin-bottom: 12px;
+    color: var(--text-dim);
+  }
+  .term-output p{ margin: 0 0 8px; }
+  .term-output p.echo{ color: var(--text); }
+  .term-output p.echo::before{ content: 'michelle@portfolio:~$ '; color: var(--data); }
+  .term-input-row{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-top: 1px solid var(--rule);
+    padding-top: 10px;
+  }
+  .term-input-row .prompt{ color: var(--data); flex-shrink: 0; }
+  #termInput{
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    outline: none;
+  }
 </style>
 </head>
 <body>
@@ -229,56 +401,120 @@
 <div class="wrap">
 
   <header>
+    <p class="eyebrow"><span class="dot"></span>Computer Science &amp; Engineering · University of Puerto Rico, Mayagüez</p>
     <h1>Michelle C. Bou Rojas</h1>
     <p class="tagline">Computer engineering student with hands-on experience in AI, data pipelines, and end-to-end solution development. Passionate about turning complex problems into actionable insights through technology.</p>
     <div class="links">
-      <a href="mailto:michelle.bou@upr.edu">michelle.bou@upr.edu</a>
-      <a href="resume.pdf">Resume (PDF)</a>
-      <a href="https://www.linkedin.com/in/YOUR-LINKEDIN-HANDLE" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="mailto:michelle.bou@upr.edu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+        michelle.bou@upr.edu
+      </a>
+      <a href="resume.pdf">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M7 3h7l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v4h4"/></svg>
+        Resume (PDF)
+      </a>
+      <a href="https://www.linkedin.com/in/YOUR-LINKEDIN-HANDLE" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 4h6v6"/><path d="M20 4L10 14"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>
+        LinkedIn
+      </a>
     </div>
   </header>
 
-  <div class="graph-frame">
+  <div class="graph-frame observe">
     <iframe src="skills-graph.html" title="Interactive skills map" loading="lazy"></iframe>
     <p class="graph-caption mono">click a skill to see the project it powered</p>
   </div>
 
-  <section id="experience">
+  <section id="experience" class="observe">
     <h2>Experience</h2>
+
+    <div class="stat-card">
+      <span class="stat-number mono" data-count-to="10" data-suffix="x">1x</span>
+      <span class="stat-label">faster engineer response time on alarm troubleshooting — from ~20 minutes down to ~2</span>
+    </div>
+
     <div class="timeline">
 
       <div class="entry">
-        <p class="role">Tech@Lilly Intern — Global DIA, Analytics &amp; AI Manufacturing</p>
-        <p class="org">Eli Lilly and Company · Indianapolis, Indiana</p>
+        <p class="role">Tech@Lilly Generative AI Engineer Intern</p>
+        <p class="org">Global DIA, Analytics &amp; AI Manufacturing Department — Eli Lilly USA · Indianapolis, Indiana</p>
         <p class="dates mono">May 2026 – August 2026</p>
-        <p class="outcome">Designed a multi-agent LLM orchestrator and RAG-based agents for manufacturing operations, cutting average engineer response time from ~20 minutes to ~2.</p>
+        <ul class="outcome-list">
+          <li>Designed and deployed a multi-agent LLM orchestrator (Python) coordinating 3 child RAG agents to power an alarm repair agent — parsing repair documentation into an ontology graph, retrieving relevant subgraphs for contextual troubleshooting, and visualizing results through an interactive D3.js graph. Integrated with Lilly's internal LLM gateway and Azure API Management, implementing 7 compatibility layers and cutting average engineer time-to-action from ~20 to ~2 minutes.</li>
+          <li>Collaborated on an engineering knowledge assistant (Python, FastAPI) that returns answers from technical knowledge bases with traceable source references, achieving a 100% pass rate across defined test cases.</li>
+          <li>Used Databricks for data processing and exploration supporting AI-driven applications, and built Power BI dashboards to turn complex data into fast access and actionable insights for stakeholders.</li>
+        </ul>
+
+        <div class="flow-diagram">
+          <p class="flow-kicker mono">simplified illustration of the agent's retrieval flow</p>
+          <svg viewBox="0 0 720 140" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="#5c6577"/>
+              </marker>
+            </defs>
+            <line x1="165" y1="70" x2="192" y2="70" stroke="#2a3140" stroke-width="2" marker-end="url(#arrow)"/>
+            <line x1="345" y1="70" x2="372" y2="70" stroke="#2a3140" stroke-width="2" marker-end="url(#arrow)"/>
+            <line x1="525" y1="70" x2="552" y2="70" stroke="#2a3140" stroke-width="2" marker-end="url(#arrow)"/>
+
+            <rect x="15" y="38" width="150" height="64" rx="10" fill="#1a2029" stroke="#2a3140" stroke-width="1.5"/>
+            <text x="90" y="66" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="#edeff2">Repair</text>
+            <text x="90" y="82" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="#edeff2">docs</text>
+
+            <rect x="195" y="38" width="150" height="64" rx="10" fill="#1a2029" stroke="#2a3140" stroke-width="1.5"/>
+            <text x="270" y="66" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="#edeff2">Ontology</text>
+            <text x="270" y="82" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="#edeff2">graph</text>
+
+            <rect x="375" y="38" width="150" height="64" rx="10" fill="#1a2029" stroke="#2a3140" stroke-width="1.5"/>
+            <text x="450" y="66" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="#edeff2">Subgraph</text>
+            <text x="450" y="82" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="#edeff2">retrieval</text>
+
+            <rect x="555" y="38" width="150" height="64" rx="10" fill="#1a2029" stroke="#2a3140" stroke-width="1.5"/>
+            <text x="630" y="66" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="#edeff2">Troubleshoot</text>
+            <text x="630" y="82" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="#edeff2">guidance</text>
+
+            <circle r="5" fill="#f2b84b">
+              <animateMotion dur="4.5s" repeatCount="indefinite" path="M90,70 L270,70 L450,70 L630,70"/>
+            </circle>
+          </svg>
+        </div>
       </div>
 
       <div class="entry">
-        <p class="role">Tech@Lilly Co-op — MQ and Automation Department</p>
-        <p class="org">Lilly Del Caribe · Carolina, Puerto Rico</p>
+        <p class="role">Tech@Lilly Analyst Co-op Student</p>
+        <p class="org">MQ and Automation Department — Lilly Del Caribe · Carolina, Puerto Rico</p>
         <p class="dates mono">August 2025 – December 2025</p>
-        <p class="outcome">Supported automation initiatives and partnered with cross-functional teams to troubleshoot systems and improve process reliability.</p>
+        <ul class="outcome-list">
+          <li>Supported automation initiatives within the MQ and Automation Department by assisting in the design, testing, and optimization of workflows to improve operational efficiency.</li>
+          <li>Partnered with cross-functional teams to identify inefficiencies, troubleshoot system issues, and implement streamlined solutions that improved process reliability.</li>
+          <li>Gained hands-on experience with automation tools and enterprise systems, contributing to continuous improvement efforts that enhance reliability and compliance.</li>
+        </ul>
       </div>
 
       <div class="entry">
         <p class="role">Strategy &amp; Consulting Intern</p>
         <p class="org">V2A Consulting · San Juan, Puerto Rico</p>
         <p class="dates mono">May 2025 – August 2025</p>
-        <p class="outcome">Evaluated nonprofit organizational capacity and funding streams, delivering client-ready strategic recommendations.</p>
+        <ul class="outcome-list">
+          <li>Conducted strategic analyses to evaluate nonprofit organizational capacity, funding streams, and program expansion opportunities.</li>
+          <li>Collaborated with consultants and peers to design actionable recommendations addressing operational efficiency and long-term sustainability.</li>
+          <li>Delivered client-ready reports, developed a visual strategy gallery to present findings to nonprofit stakeholders, and produced a comprehensive final report consolidating all analyses and recommendations.</li>
+        </ul>
       </div>
 
       <div class="entry">
         <p class="role">Website Developer &amp; Social Media Manager</p>
-        <p class="org">Dept. of Social Sciences, University of Puerto Rico, Mayagüez</p>
+        <p class="org">Dept. of Social Sciences — University of Puerto Rico, Mayagüez</p>
         <p class="dates mono">August 2023 – Present</p>
-        <p class="outcome">Built the department website from scratch and manage content and analytics across its social platforms.</p>
+        <ul class="outcome-list">
+          <li>Built the department's website entirely from scratch using HTML code and WordPress with responsive, user-friendly design; managed content across Facebook, Instagram, and TikTok; and analyzed performance using Google Analytics and platform-specific insights to inform strategic decisions.</li>
+        </ul>
       </div>
 
     </div>
   </section>
 
-  <section id="education">
+  <section id="education" class="observe">
     <h2>Education &amp; Certifications</h2>
     <div class="grid-2">
       <div>
@@ -299,10 +535,10 @@
     </div>
   </section>
 
-  <section id="beyond">
+  <section id="beyond" class="observe">
     <h2>Beyond the classroom</h2>
     <ul class="extra-list">
-      <li><span class="role-name">Logistics Division Leader — Quasar VEX V5</span><span class="when mono">Aug 2026 – Present</span></li>
+      <li><span class="role-name">Logistics Division Leader — Quasar UPRM VEX V5</span><span class="when mono">Aug 2026 – Present</span></li>
       <li><span class="role-name">Business Lead &amp; Web Master — Loxodon-1, UPRM</span><span class="when mono">Aug 2024 – May 2025</span></li>
       <li><span class="role-name">Department Advocate — ACM-W</span><span class="when mono">Aug 2024 – Feb 2025</span></li>
       <li><span class="role-name">Data Analyst — Computational Chemistry Investigation, Dept. of Chemistry</span><span class="when mono">Aug 2022 – May 2023</span></li>
@@ -310,11 +546,104 @@
     </ul>
   </section>
 
+  <section id="terminal" class="observe">
+    <h2>Say hi to the CLI</h2>
+    <div class="term">
+      <div class="term-output mono" id="termOutput">
+        <p>Type <strong>help</strong> to get started.</p>
+      </div>
+      <div class="term-input-row">
+        <span class="prompt mono">michelle@portfolio:~$</span>
+        <input id="termInput" class="mono" autocomplete="off" spellcheck="false" aria-label="Terminal command input" />
+      </div>
+    </div>
+  </section>
+
   <footer>
     <p class="mono">Last updated September 2026</p>
   </footer>
 
 </div>
+
+<script>
+  // ---------- scroll reveal ----------
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting){
+        entry.target.classList.add('in-view');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.observe').forEach(el => observer.observe(el));
+
+  // ---------- animated stat counter ----------
+  const statEl = document.querySelector('.stat-number[data-count-to]');
+  if (statEl){
+    const target = parseInt(statEl.dataset.countTo, 10);
+    const suffix = statEl.dataset.suffix || '';
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const statObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting){
+          if (reduceMotion){
+            statEl.textContent = target + suffix;
+          } else {
+            const duration = 900;
+            const start = performance.now();
+            function tick(now){
+              const progress = Math.min((now - start) / duration, 1);
+              const eased = 1 - Math.pow(1 - progress, 3);
+              const value = Math.round(1 + eased * (target - 1));
+              statEl.textContent = value + suffix;
+              if (progress < 1) requestAnimationFrame(tick);
+            }
+            requestAnimationFrame(tick);
+          }
+          statObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.4 });
+    statObserver.observe(statEl);
+  }
+
+  // ---------- terminal easter egg ----------
+  const termInput = document.getElementById('termInput');
+  const termOutput = document.getElementById('termOutput');
+  const commands = {
+    whoami: () => 'Michelle C. Bou Rojas — Computer Science & Engineering student, UPR Mayagüez.',
+    help: () => 'Try: whoami · skills · experience · contact · clear',
+    skills: () => 'AI Agents & LLMs · RAG · Multi-Agent Orchestration · Python · FastAPI · Flask · Databricks · SQL · Power BI · D3.js · WordPress',
+    experience: () => 'Tech@Lilly Generative AI Engineer Intern · Tech@Lilly Analyst Co-op · V2A Consulting · UPR Dept. of Social Sciences',
+    contact: () => 'michelle.bou@upr.edu',
+  };
+  if (termInput && termOutput){
+    termInput.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter') return;
+      const raw = termInput.value.trim();
+      if (!raw) return;
+      const echo = document.createElement('p');
+      echo.className = 'echo';
+      echo.textContent = raw;
+      termOutput.appendChild(echo);
+
+      const key = raw.toLowerCase();
+      if (key === 'clear'){
+        termOutput.innerHTML = '';
+      } else if (commands[key]){
+        const line = document.createElement('p');
+        line.textContent = commands[key]();
+        termOutput.appendChild(line);
+      } else {
+        const line = document.createElement('p');
+        line.textContent = `command not found: ${raw} — try help`;
+        termOutput.appendChild(line);
+      }
+      termInput.value = '';
+      termOutput.scrollTop = termOutput.scrollHeight;
+    });
+  }
+</script>
 
 </body>
 </html>
