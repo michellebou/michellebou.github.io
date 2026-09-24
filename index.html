@@ -49,6 +49,11 @@
     padding: 0 clamp(20px, 5vw, 28px);
   }
   .mono{ font-family: 'IBM Plex Mono', monospace; }
+  .hero-full{
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 clamp(20px, 5vw, 40px);
+  }
 
   /* ---------- header / hero ---------- */
   header{
@@ -398,7 +403,7 @@
 </head>
 <body>
 
-<div class="wrap">
+<div class="hero-full">
 
   <header>
     <p class="eyebrow"><span class="dot"></span>Computer Science &amp; Engineering · University of Puerto Rico, Mayagüez</p>
@@ -413,7 +418,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M7 3h7l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v4h4"/></svg>
         Resume (PDF)
       </a>
-      <a href="https://www.linkedin.com/in/YOUR-LINKEDIN-HANDLE" target="_blank" rel="noopener">
+      <a href="https://www.linkedin.com/in/michellebourojas/" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 4h6v6"/><path d="M20 4L10 14"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>
         LinkedIn
       </a>
@@ -424,6 +429,10 @@
     <iframe src="skills-graph.html" title="Interactive skills map" loading="lazy"></iframe>
     <p class="graph-caption mono">click a skill to see the project it powered</p>
   </div>
+
+</div>
+
+<div class="wrap">
 
   <section id="experience" class="observe">
     <h2>Experience</h2>
