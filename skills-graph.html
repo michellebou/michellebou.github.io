@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Michelle Bou Rojas — Skills Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<style>
+  :root{
+    --bg: #12161d;
+    --panel: #1a2029;
+    --panel-border: #2a3140;
+    --text: #edeff2;
+    --text-dim: #8d96a6;
+    --text-faint: #5c6577;
+    --ai: #f2b84b;
+    --data: #59c3b4;
+    --web: #9c8cf5;
+    --core: #e8ecf1;
+    --me: #ffffff;
+    --link: #333c4a;
+    --link-active: #ffffff;
+    --spoke: #232a35;
+  }
+  *{ box-sizing: border-box; }
+  html, body{
+    margin:0; padding:0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    height: 100%;
+    overflow: hidden;
+  }
+  #app{
+    display:flex;
+    flex-direction: column;
+    height: 100vh;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  header{
+    padding: 28px clamp(20px, 4vw, 48px) 14px;
+    flex-shrink: 0;
+  }
+  h1{
+    font-size: clamp(20px, 2.4vw, 28px);
+    font-weight: 600;
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+  }
+  header p{
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 14px;
+    max-width: 640px;
+    line-height: 1.5;
+  }
+  .legend{
+    display:flex;
+    gap: 20px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  .legend-item{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    font-size: 12.5px;
+    color: var(--text-dim);
+  }
+  .legend-dot{
+    width: 9px; height:9px; border-radius:50%;
+    flex-shrink:0;
+  }
+  main{
+    position: relative;
+    flex: 1;
+    min-height: 0;
+  }
+  svg{
+    display:block;
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+  }
+  svg:active{ cursor: grabbing; }
+
+  .node-label{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    fill: var(--text);
+    pointer-events: none;
+    paint-order: stroke;
+    stroke: var(--bg);
+    stroke-width: 3px;
+    stroke-linejoin: round;
+  }
+  .node-label.dim{ fill: var(--text-faint); }
+  .me-label{
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    fill: var(--text);
+    pointer-events: none;
+    text-anchor: middle;
+    paint-order: stroke;
+    stroke: var(--bg);
+    stroke-width: 4px;
+    stroke-linejoin: round;
+  }
+  .me-sublabel{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    fill: var(--text-dim);
+    pointer-events: none;
+    text-anchor: middle;
+    paint-order: stroke;
+    stroke: var(--bg);
+    stroke-width: 4px;
+    stroke-linejoin: round;
+  }
+
+  #panel{
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: min(300px, calc(100vw - 40px));
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    transform: translateX(340px);
+    opacity: 0;
+    transition: transform 0.28s ease, opacity 0.28s ease;
+    pointer-events: none;
+  }
+  #panel.open{
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  #panel .kicker{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    color: var(--text-faint);
+    margin: 0 0 4px;
+  }
+  #panel h2{
+    font-size: 17px;
+    margin: 0 0 4px;
+    font-weight: 600;
+  }
+  #panel .used-in{
+    font-size: 11.5px;
+    color: var(--text-faint);
+    margin: 0 0 12px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  #panel ul{
+    margin: 0 0 14px;
+    padding-left: 18px;
+  }
+  #panel li{
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.5;
+    margin-bottom: 6px;
+  }
+  #panel .close{
+    position:absolute;
+    top: 14px; right: 14px;
+    background: none;
+    border: none;
+    color: var(--text-faint);
+    font-size: 18px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 2px 6px;
+  }
+  #panel .close:hover{ color: var(--text); }
+
+  #hint{
+    position:absolute;
+    bottom: 18px;
+    left: 20px;
+    font-size: 12px;
+    color: var(--text-faint);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  @media (max-width: 640px){
+    header{ padding: 20px 18px 10px; }
+    #hint{ display:none; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>Skills, mapped by the projects that connect them</h1>
+    <p>Every skill connects back to me at the center. Lines between skills mean they were used together on the same project. Click a skill to see which project it powered.</p>
+    <div class="legend">
+      <div class="legend-item"><span class="legend-dot" style="background:var(--ai)"></span>AI &amp; LLM Systems</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--data)"></span>Data &amp; Backend</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--web)"></span>Web &amp; Visualization</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--core)"></span>Core</div>
+    </div>
+  </header>
+  <main>
+    <svg id="graph"></svg>
+    <div id="panel">
+      <button class="close" aria-label="Close">&times;</button>
+      <p class="kicker" id="panel-kicker">PROJECT</p>
+      <h2 id="panel-title"></h2>
+      <p class="used-in" id="panel-meta"></p>
+      <ul id="panel-skills"></ul>
+    </div>
+    <div id="hint">drag to rearrange · click a node</div>
+  </main>
+</div>
+
+<script>
+const categories = {
+  ai:   { color: 'var(--ai)' },
+  data: { color: 'var(--data)' },
+  web:  { color: 'var(--web)' },
+  core: { color: 'var(--core)' },
+  me:   { color: 'var(--me)' }
+};
+
+const ME = {
+  id: 'me',
+  label: 'Michelle C. Bou Rojas',
+  sublabel: 'Senior in Computer Science & Engineering',
+  cat: 'me'
+};
+
+const projects = [
+  {
+    id: 'orchestrator',
+    name: 'Multi-Agent LLM Orchestrator',
+    company: 'Eli Lilly and Company',
+    year: '2026',
+    skills: ['python','flask','multiagent','rag','d3','apim','promptend'],
+    blurb: [
+      'Coordinated 3 child RAG agents to power an alarm repair assistant.',
+      'Parsed repair documentation into an ontology graph for contextual troubleshooting.',
+      'Cut average engineer time-to-action from ~20 min to ~2 min.'
+    ]
+  },
+  {
+    id: 'ragagent',
+    name: 'Manufacturing Alarm RAG Agent',
+    company: 'Eli Lilly and Company',
+    year: '2026',
+    skills: ['python','rag','promptend'],
+    blurb: [
+      'Standalone retrieval-augmented agent supporting alarm handling in manufacturing operations.'
+    ]
+  },
+  {
+    id: 'knowledge',
+    name: 'Engineering Knowledge Assistant',
+    company: 'Eli Lilly and Company',
+    year: '2026',
+    skills: ['python','fastapi','rag'],
+    blurb: [
+      'Retrieves answers from technical knowledge bases with traceable source references.',
+      'Achieved a 100% pass rate across defined test cases.'
+    ]
+  },
+  {
+    id: 'datapipe',
+    name: 'Data Pipelines & Dashboards',
+    company: 'Eli Lilly and Company',
+    year: '2026',
+    skills: ['databricks','sql','etl','powerbi'],
+    blurb: [
+      'Processed and explored manufacturing data to support AI-driven applications.',
+      'Built Power BI dashboards turning complex data into stakeholder insights.'
+    ]
+  },
+  {
+    id: 'website',
+    name: 'Department Website',
+    company: 'UPR Mayagüez — Dept. of Social Sciences',
+    year: '2023–Present',
+    skills: ['html','wordpress','ganalytics','restapi'],
+    blurb: [
+      'Built the department website from scratch — responsive design, full navigation.',
+      'Managed content across Facebook, Instagram and TikTok, tracked with Analytics.'
+    ]
+  }
+];
+
+const skillMeta = {
+  python:     { label: 'Python',                cat: 'core' },
+  multiagent: { label: 'Multi-Agent Orchestration', cat: 'ai' },
+  rag:        { label: 'RAG',                    cat: 'ai' },
+  promptend:  { label: 'Prompt Engineering',      cat: 'ai' },
+  apim:       { label: 'Azure API Mgmt',          cat: 'ai' },
+  fastapi:    { label: 'FastAPI',                 cat: 'data' },
+  flask:      { label: 'Flask',                   cat: 'data' },
+  databricks: { label: 'Databricks',              cat: 'data' },
+  sql:        { label: 'SQL',                     cat: 'data' },
+  etl:        { label: 'ETL',                      cat: 'data' },
+  powerbi:    { label: 'Power BI',                cat: 'data' },
+  d3:         { label: 'D3.js',                   cat: 'web' },
+  html:       { label: 'HTML / CSS',              cat: 'web' },
+  wordpress:  { label: 'WordPress',               cat: 'web' },
+  ganalytics: { label: 'Google Analytics',        cat: 'web' },
+  restapi:    { label: 'REST APIs',               cat: 'web' }
+};
+
+const usageCount = {};
+projects.forEach(p => p.skills.forEach(s => usageCount[s] = (usageCount[s]||0)+1));
+
+const skillNodes = Object.keys(skillMeta).map(id => ({
+  id,
+  label: skillMeta[id].label,
+  cat: skillMeta[id].cat,
+  count: usageCount[id] || 0
+}));
+
+const nodes = [ME, ...skillNodes];
+
+// project co-use links (skill <-> skill)
+const linkSet = new Map();
+projects.forEach(p => {
+  for (let i=0; i<p.skills.length; i++){
+    for (let j=i+1; j<p.skills.length; j++){
+      const a = p.skills[i], b = p.skills[j];
+      const key = [a,b].sort().join('__');
+      if (!linkSet.has(key)) linkSet.set(key, { source:a, target:b, type:'project' });
+    }
+  }
+});
+const projectLinks = Array.from(linkSet.values());
+
+// spoke links: every skill connects back to me
+const spokeLinks = skillNodes.map(n => ({ source: 'me', target: n.id, type: 'spoke' }));
+
+const links = [...spokeLinks, ...projectLinks];
+
+const svg = d3.select('#graph');
+const main = document.querySelector('main');
+let width = main.clientWidth, height = main.clientHeight;
+
+function resize(){
+  width = main.clientWidth;
+  height = main.clientHeight;
+  svg.attr('viewBox', [0,0,width,height]);
+}
+resize();
+window.addEventListener('resize', resize);
+
+const g = svg.append('g');
+
+svg.call(d3.zoom()
+  .scaleExtent([0.5, 2.5])
+  .on('zoom', (event) => g.attr('transform', event.transform)));
+
+const linkEls = g.append('g')
+  .selectAll('line')
+  .data(links)
+  .join('line')
+  .attr('stroke', d => d.type === 'spoke' ? 'var(--spoke)' : 'var(--link)')
+  .attr('stroke-width', d => d.type === 'spoke' ? 1 : 1.3);
+
+function nodeRadius(d){
+  if (d.id === 'me') return 72;
+  return 9 + d.count * 3.5;
+}
+
+const nodeG = g.append('g')
+  .selectAll('g')
+  .data(nodes)
+  .join('g')
+  .style('cursor', 'pointer')
+  .call(d3.drag()
+    .on('start', dragstarted)
+    .on('drag', dragged)
+    .on('end', dragended));
+
+nodeG.filter(d => d.id === 'me').append('circle')
+  .attr('r', nodeRadius)
+  .attr('fill', 'var(--bg)')
+  .attr('stroke', 'var(--me)')
+  .attr('stroke-width', 2);
+
+nodeG.filter(d => d.id !== 'me').append('circle')
+  .attr('r', nodeRadius)
+  .attr('fill', d => categories[d.cat].color)
+  .attr('fill-opacity', 0.85)
+  .attr('stroke', 'var(--bg)')
+  .attr('stroke-width', 2);
+
+nodeG.filter(d => d.id !== 'me').append('text')
+  .attr('class', 'node-label')
+  .attr('x', d => nodeRadius(d) + 6)
+  .attr('y', 4)
+  .text(d => d.label);
+
+const meNodeG = nodeG.filter(d => d.id === 'me');
+
+meNodeG.append('text')
+  .attr('class', 'me-label')
+  .attr('y', -22)
+  .text('Michelle');
+
+meNodeG.append('text')
+  .attr('class', 'me-label')
+  .attr('y', -5)
+  .text('C. Bou Rojas');
+
+meNodeG.append('text')
+  .attr('class', 'me-sublabel')
+  .attr('y', 15)
+  .text('Senior in CS');
+
+meNodeG.append('text')
+  .attr('class', 'me-sublabel')
+  .attr('y', 28)
+  .text('& Engineering');
+
+nodeG.on('click', (event, d) => {
+  event.stopPropagation();
+  if (d.id === 'me') { showAbout(); return; }
+  showProjectsFor(d.id);
+});
+
+const simulation = d3.forceSimulation(nodes)
+  .force('link', d3.forceLink(links).id(d => d.id)
+    .distance(l => l.type === 'spoke' ? 230 : 70)
+    .strength(l => l.type === 'spoke' ? 0.35 : 0.6))
+  .force('charge', d3.forceManyBody().strength(-220))
+  .force('center', d3.forceCenter(width/2, height/2))
+  .force('collide', d3.forceCollide(d => nodeRadius(d) + 14))
+  .on('tick', ticked);
+
+nodes.find(n => n.id === 'me').fx = width/2;
+nodes.find(n => n.id === 'me').fy = height/2;
+
+function ticked(){
+  linkEls
+    .attr('x1', d => d.source.x)
+    .attr('y1', d => d.source.y)
+    .attr('x2', d => d.target.x)
+    .attr('y2', d => d.target.y);
+  nodeG.attr('transform', d => `translate(${d.x},${d.y})`);
+}
+
+function dragstarted(event, d){
+  if (!event.active) simulation.alphaTarget(0.25).restart();
+  if (d.id !== 'me'){ d.fx = d.x; d.fy = d.y; }
+}
+function dragged(event, d){
+  if (d.id === 'me') return;
+  d.fx = event.x; d.fy = event.y;
+}
+function dragended(event, d){
+  if (!event.active) simulation.alphaTarget(0);
+  if (d.id !== 'me'){ d.fx = null; d.fy = null; }
+}
+
+const panel = document.getElementById('panel');
+const panelKicker = document.getElementById('panel-kicker');
+const panelTitle = document.getElementById('panel-title');
+const panelMeta = document.getElementById('panel-meta');
+const panelSkills = document.getElementById('panel-skills');
+document.querySelector('#panel .close').addEventListener('click', closePanel);
+
+function highlightSet(relevantIds){
+  nodeG.select('circle')
+    .attr('fill-opacity', d => (d.id === 'me' || relevantIds.has(d.id)) ? 0.95 : 0.25)
+    .attr('stroke', d => d.id === 'me' ? 'var(--me)' : 'var(--bg)');
+  nodeG.selectAll('text.node-label')
+    .classed('dim', d => !relevantIds.has(d.id));
+  linkEls
+    .attr('stroke', l => {
+      const a = relevantIds.has(l.source.id) || l.source.id === 'me';
+      const b = relevantIds.has(l.target.id) || l.target.id === 'me';
+      const bothRelevant = relevantIds.has(l.source.id) && relevantIds.has(l.target.id);
+      const spokeToRelevant = l.type === 'spoke' && (relevantIds.has(l.source.id) || relevantIds.has(l.target.id));
+      return (bothRelevant || spokeToRelevant) ? 'var(--link-active)' : (l.type === 'spoke' ? 'var(--spoke)' : 'var(--link)');
+    })
+    .attr('stroke-opacity', l => {
+      const bothRelevant = relevantIds.has(l.source.id) && relevantIds.has(l.target.id);
+      const spokeToRelevant = l.type === 'spoke' && (relevantIds.has(l.source.id) || relevantIds.has(l.target.id));
+      return (bothRelevant || spokeToRelevant) ? 0.9 : 0.12;
+    });
+}
+
+function showProjectsFor(skillId){
+  const relatedProjects = projects.filter(p => p.skills.includes(skillId));
+  if (relatedProjects.length === 0) return;
+  const project = relatedProjects[0];
+  const relevantSkillIds = new Set(project.skills);
+
+  panelKicker.textContent = 'PROJECT';
+  panelTitle.textContent = project.name;
+  panelMeta.textContent = `${project.company} · ${project.year}`;
+  panelSkills.innerHTML = '';
+  project.blurb.forEach(line => {
+    const li = document.createElement('li');
+    li.textContent = line;
+    panelSkills.appendChild(li);
+  });
+
+  highlightSet(relevantSkillIds);
+  panel.classList.add('open');
+}
+
+function showAbout(){
+  panelKicker.textContent = 'ABOUT';
+  panelTitle.textContent = 'Michelle C. Bou Rojas';
+  panelMeta.textContent = '';
+  panelSkills.innerHTML = '';
+  [
+    'Senior in Computer Science & Engineering, University of Puerto Rico Mayagüez.',
+    'Turns complex problems into actionable insights through AI and technology.',
+    'Click any skill around me to see the project it powered.'
+  ].forEach(line => {
+    const li = document.createElement('li');
+    li.textContent = line;
+    panelSkills.appendChild(li);
+  });
+
+  nodeG.select('circle').attr('fill-opacity', d => d.id === 'me' ? 1 : 0.85);
+  nodeG.selectAll('text.node-label').classed('dim', false);
+  linkEls.attr('stroke', d => d.type === 'spoke' ? 'var(--spoke)' : 'var(--link)').attr('stroke-opacity', 1);
+
+  panel.classList.add('open');
+}
+
+function closePanel(){
+  panel.classList.remove('open');
+  nodeG.select('circle').attr('fill-opacity', d => d.id === 'me' ? 1 : 0.85);
+  nodeG.selectAll('text.node-label').classed('dim', false);
+  linkEls.attr('stroke', d => d.type === 'spoke' ? 'var(--spoke)' : 'var(--link)').attr('stroke-opacity', 1);
+}
+
+svg.on('click', () => closePanel());
+</script>
+</body>
+</html>
