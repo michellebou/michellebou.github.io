@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Michelle C. Bou Rojas</title>
-<meta name="description" content="CComputer Science & Engineering student passionate about AI, building end-to-end, data-driven solutions.">
+<meta name="description" content="Computer Science & Engineering student passionate about AI, building end-to-end, data-driven solutions.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Michelle C. Bou Rojas">
 <meta property="og:description" content="Computer Science & Engineering student passionate about AI, building end-to-end, data-driven solutions.">
@@ -247,6 +247,26 @@
     margin-bottom: 8px;
   }
   .entry ul.outcome-list li:last-child{ margin-bottom: 0; }
+  .entry-link{
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--web);
+    background: rgba(156, 140, 245, 0.10);
+    border: 1px solid rgba(156, 140, 245, 0.35);
+    border-radius: 999px;
+    padding: 7px 14px;
+    margin-top: 12px;
+    transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+  }
+  .entry-link:hover{
+    color: var(--text);
+    border-color: var(--web);
+    background: rgba(156, 140, 245, 0.18);
+    transform: translateY(-1px);
+  }
 
   /* ---------- two-up grid (education / certs) ---------- */
   .grid-2{
@@ -581,6 +601,7 @@
         <ul class="outcome-list">
           <li>Built the department's website entirely from scratch using HTML code and WordPress with responsive, user-friendly design; managed content across Facebook, Instagram, and TikTok; and analyzed performance using Google Analytics and platform-specific insights to inform strategic decisions.</li>
         </ul>
+        <a class="entry-link mono" href="https://www.uprm.edu/cienciassociales/" target="_blank" rel="noopener">Visit site ↗</a>
 
         <div class="flow-diagram">
           <p class="flow-kicker mono">simplified illustration of the content workflow</p>
